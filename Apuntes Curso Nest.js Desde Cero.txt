@@ -1,2 +1,207 @@
+git add ApuntesNestJS.txt
+git commit -m "Agrego sección sobre controladores"
+git push
+
 Minuto 12 (Archivos Apps)
+
+Los módulos lo que hacen es agrupar rutas con sus funcionalidades incorporadas.
+
+app.module.ts en nest.js
+
+En NestJS, el archivo app.module.ts es uno de los archivos más importantes de cualquier aplicación. Es el módulo raíz de tu aplicación — el que Nest usa como punto de entrada para construir y organizar el resto de los componentes.
+
+✅ ¿Qué es un módulo en NestJS?
+Un módulo en NestJS es una clase que organiza código relacionado en un mismo lugar: controladores, servicios, otros módulos, etc. Sirve para mantener el código limpio y modular.
+
+📁 ¿Para qué sirve app.module.ts?
+app.module.ts define el módulo principal de la aplicación, y le dice a NestJS:
+
+Qué controladores usar
+
+Qué servicios usar (providers)
+
+Qué otros módulos cargar
+
+Es como el "centro de operaciones" donde se configura lo esencial.
+
+🧠 Ejemplo básico de app.module.ts
+ts
+Copiar
+Editar
+import { Module } from '@nestjs/common';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+
+@Module({
+  imports: [],              // Aquí importás otros módulos
+  controllers: [AppController],  // Aquí definís los controladores
+  providers: [AppService],       // Aquí los servicios o lógica de negocio
+})
+export class AppModule {}
+🧩 ¿Por qué es importante?
+Es el punto de inicio cuando Nest arranca la app.
+
+Todos los demás módulos terminan conectándose desde aquí (directa o indirectamente).
+
+Sin AppModule, NestJS no sabría qué cargar al iniciar.
+
+el app-module.ts es llamado por el main.ts
+
+Minuto 15, donde se crean las rutas es en el app.controller.ts
+
+El archivo **app.controller.ts** en NestJS define el controlador principal de la aplicación, y su rol es manejar las solicitudes HTTP que llegan a tu aplicación.
+
+✅ ¿Qué es un controlador en NestJS?
+Un controlador (controller):
+
+Recibe las solicitudes del cliente (como peticiones GET, POST, etc.)
+
+Llama a servicios o lógica de negocio para procesarlas
+
+Devuelve una respuesta
+
+En resumen: es la capa que se encarga de responder a las rutas de tu API.
+
+🧠 Ejemplo básico de app.controller.ts
+ts
+Copiar
+Editar
+import { Controller, Get } from '@nestjs/common';
+import { AppService } from './app.service';
+
+@Controller()
+export class AppController {
+  constructor(private readonly appService: AppService) {}
+
+  @Get()
+  getHello(): string {
+    return this.appService.getHello();
+  }
+}
+🔍 ¿Qué hace ese código?
+@Controller() ➜ Marca la clase como controlador. Puede tener un path (como @Controller('productos')).
+
+@Get() ➜ Define una ruta HTTP GET en /.
+
+getHello() ➜ Es el método que maneja la solicitud. Aquí llama a un método del servicio (appService.getHello()).
+
+Entonces, cuando alguien accede a http://localhost:3000/, este controlador responde.
+
+🧩 En resumen:
+Archivo	Rol
+app.module.ts	Punto central que conecta controladores y servicios
+app.controller.ts	Maneja rutas y solicitudes HTTP
+app.service.ts	Contiene la lógica de negocio (lo que no es directamente HTTP)
+
+¿Te gustaría ver cómo crear tu propio controlador personalizado, como por ejemplo uno para manejar productos o usuarios?
+
+Que es app.service.ts
+
+ChatGPT Plus
+Perfecto, ¡vamos con el siguiente archivo clave! 🔍
+
+✅ ¿Qué es app.service.ts en NestJS?
+El archivo **app.service.ts** define un servicio, que en NestJS representa la lógica de negocio de la aplicación. Los servicios se encargan de hacer cosas como:
+
+Acceder a una base de datos
+
+Calcular o procesar datos
+
+Manejar operaciones de negocio
+
+Servir como intermediario entre controladores y datos
+
+🧠 ¿Por qué usar un servicio?
+La idea en NestJS (y en buenas prácticas de desarrollo) es mantener separados los roles:
+
+El controlador maneja las rutas HTTP y las respuestas.
+
+El servicio contiene la lógica real: qué hacer con esos datos.
+
+Esto hace tu código más limpio, reutilizable y fácil de probar.
+
+📁 Ejemplo básico de app.service.ts
+ts
+Copiar
+Editar
+import { Injectable } from '@nestjs/common';
+
+@Injectable()
+export class AppService {
+  getHello(): string {
+    return '¡Hola desde el servicio!';
+  }
+}
+@Injectable() ➜ Le dice a NestJS que esta clase puede ser inyectada en otras partes, como los controladores.
+
+getHello() ➜ Es un método que el controlador puede llamar para obtener un valor.
+
+🔗 ¿Cómo se conecta con app.controller.ts?
+En el controlador (app.controller.ts) se "inyecta" el servicio:
+
+ts
+Copiar
+Editar
+constructor(private readonly appService: AppService) {}
+Y luego se usa:
+
+ts
+Copiar
+Editar
+@Get()
+getHello(): string {
+  return this.appService.getHello(); // Llama al servicio
+}
+🧩 En resumen:
+Archivo	Rol
+app.module.ts	Configura la aplicación y registra servicios y controladores
+app.controller.ts	Maneja las rutas y peticiones HTTP
+app.service.ts	Contiene la lógica de negocio de la app
+
+Que es app.controller.spec.ts
+
+¡Muy buena pregunta! 🧪
+
+El archivo **app.controller.spec.ts** es un archivo de pruebas (tests). En NestJS (y en general en TypeScript con Jest), los archivos .spec.ts están diseñados para probar que tu código funciona como se espera.
+
+✅ ¿Qué es app.controller.spec.ts?
+Es un archivo que prueba el comportamiento del AppController, asegurándose de que las funciones del controlador:
+
+Devuelvan lo que deben
+
+Llamen correctamente a los servicios
+
+Manejen bien la lógica
+
+Es parte de la programación orientada a pruebas (TDD o simplemente pruebas unitarias).
+
+🧠 ¿Qué contiene?
+Un ejemplo típico se ve así:
+
+ts
+Copiar
+Editar
+import { Test, TestingModule } from '@nestjs/testing';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+
+describe('AppController', () => {
+  let appController: AppController;
+
+  beforeEach(async () => {
+    const app: TestingModule = await Test.createTestingModule({
+      controllers: [AppController],
+      providers: [AppService],
+    }).compile();
+
+    appController = app.get<AppController>(AppController);
+  });
+
+  describe('getHello', () => {
+    it('should return "¡Hola desde el servicio!"', () => {
+      expect(appController.getHello()).toBe('¡Hola desde el servicio!');
+    });
+  });
+});
+
 
